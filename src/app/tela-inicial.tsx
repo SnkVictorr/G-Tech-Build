@@ -3,11 +3,22 @@ import React from 'react';
 import { Header } from '../components/header'
 import { AntDesign, MaterialIcons, Feather } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { Octicons } from '@expo/vector-icons';
+
 
 export default function TelaInicial() {
+  const localizar = () => {
+      router.navigate("/gerenciador");
+    };
+  // const manutencao = () => {
+  //     router.navigate("/manutencao");
+  //   };
+
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <Header />
+        <Header texto='Gerenciador de Estoque' local='/'
+        icon={<Octicons name="home" size={24} color="white" />}/>
         <Text style={styles.texto}>
           <AntDesign name="linechart" size={24} color="black" /> Página Inicial
         </Text>
@@ -16,12 +27,12 @@ export default function TelaInicial() {
         {/* Container dos cards */}
         <View style={styles.cardsContainer}>
           {/* Card 1 - Localizar Componentes */}
-          <TouchableOpacity style={[styles.card, styles.card1]} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.card, styles.card1]} activeOpacity={0.8} onPress={localizar}>
             <View style={styles.cardContent}>
               <MaterialIcons name="inventory" size={28} color="#64ca11" />
               <View style={styles.cardTextContainer}>
-                <Text style={[styles.cardTitle, {color: '#fff'}]}>Localizar Componentes</Text>
-                <Text style={[styles.cardSubtitle, {color: '#c9e0f5'}]}>Consulte os componentes</Text>
+                <Text style={[styles.cardTitle, {color: '#fff'}]}>Localizar Equipamentos</Text>
+                <Text style={[styles.cardSubtitle, {color: '#c9e0f5'}]}>Consulte os Equipamentos</Text>
               </View>
             </View>
             <AntDesign 
@@ -33,12 +44,13 @@ export default function TelaInicial() {
           </TouchableOpacity>
 
           {/* Card 2 - Em Manutenção */}
-          <TouchableOpacity style={[styles.card, styles.card2]} activeOpacity={0.8}>
+          <TouchableOpacity  style={[styles.card, styles.card2]} activeOpacity={0.8} //onPress={manutencao}
+          >
             <View style={styles.cardContent}>
               <Feather name="alert-triangle" size={28} color="#d85c13" />
               <View style={styles.cardTextContainer}>
-                <Text style={styles.cardTitle}>Componentes Em Manutenção</Text>
-                <Text style={styles.cardSubtitle}>Ver componentes em manutenção</Text>
+                <Text style={styles.cardTitle}>Equipamentos Em Manutenção</Text>
+                <Text style={styles.cardSubtitle}>Ver equipamentos em manutenção</Text>
               </View>
             </View>
             <AntDesign 

@@ -5,14 +5,22 @@ import { styles } from './style';
 import Octicons from '@expo/vector-icons/Octicons';
 import { Link } from 'expo-router';
 
-
-export function Header() {
+interface HeaderProps {
+  texto?: string;  // Texto do título
+  local?: string;  // Rota para onde o botão vai
+  icon?: React.ReactElement; // Cor opcional do ícone
+}
+export function Header({texto, local = "/", icon}: HeaderProps) {
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Pressable><Link href={"/"}><Octicons name="home" size={24} color="white" /></Link></Pressable>
-        <Text style={styles.title}>Controle de Estoque</Text>
+        <Pressable>
+            <Link href={local}>
+              {icon || null}
+            </Link>
+          </Pressable>
+        <Text style={styles.title}>{texto}</Text>
       </View>
       
     </View>
