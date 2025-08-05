@@ -26,31 +26,18 @@ const locaisPadrao = [
   "Sala Experimental 11/12",
   "Sala 10",
   "Sala 09",
-  "Lab. Informática 08",
+  "Lab.Infor. 08",
   "Sala 07",
   "Sala 15",
   "Sala 16",
   "Sala 17",
-  "Sala 21",
-  "Sala 22",
-  "Sala 20",
-  "Sala 23",
   "Sala Bar 18",
   "Cozinha Pedagógica 19",
   "Auditório",
   "Sala Docentes",
   "Setor Técnico",
   "Admin",
-  "Lab. Informática 01",
-  "Recepção",
-  "Secretaria",
-  "Lab. Informática 02",
-  "Lab. Hardware e Cisco 03",
-  "Lab. Informática 04",
-  "Lab. Informática 05",
-  "Lab. Informática 06",
-  "Dep. Equip.",
-  "Biblioteca ",
+  "Lab.Infor 01",
 ];
 
 export default function GerenciadorEquipamentos() {
@@ -70,12 +57,12 @@ export default function GerenciadorEquipamentos() {
       if (locaisSalvos) {
         const parsed = JSON.parse(locaisSalvos);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setLocais(parsed.sort((a, b) => a.localeCompare(b)));
+          setLocais(parsed);
         } else {
-          setLocais([...locaisPadrao].sort((a, b) => a.localeCompare(b)));
+          setLocais(locaisPadrao);
         }
       } else {
-        setLocais([...locaisPadrao].sort((a, b) => a.localeCompare(b)));
+        setLocais(locaisPadrao);
       }
     };
     carregarDados();
@@ -118,10 +105,7 @@ export default function GerenciadorEquipamentos() {
       return;
     }
 
-    setLocais((prev) =>
-      [...prev, novoLocal.trim()].sort((a, b) => a.localeCompare(b))
-    );
-
+    setLocais((prev) => [...prev, novoLocal.trim()]);
     setLocalSelecionado(novoLocal.trim());
     setNovoLocal("");
     setModalVisible(false);
@@ -131,48 +115,21 @@ export default function GerenciadorEquipamentos() {
     setDados((prev) => prev.filter((equip) => equip.numero !== numeroEquip));
   };
 
-  useEffect(() => {
-    const carregarLocais = async () => {
-      try {
-        const locaisSalvos = await AsyncStorage.getItem("locais");
-        if (locaisSalvos !== null) {
-          setLocais(JSON.parse(locaisSalvos));
-        } else {
-          // Primeira vez: salvar locais padrão
-          await AsyncStorage.setItem("locais", JSON.stringify(locaisPadrao));
-          setLocais(locaisPadrao);
-        }
-      } catch (error) {
-        console.log("Erro ao carregar locais:", error);
-      }
-    };
-
-    carregarLocais();
-  }, []);
-
-  const salvarLocais = async (novosLocais) => {
-    try {
-      await AsyncStorage.setItem("locaisSalvos", JSON.stringify(novosLocais));
-    } catch (error) {
-      console.error("Erro ao salvar locais:", error);
-    }
-  };
-
-  const removerLocal = (localParaRemover) => {
+  const removerLocal = (local: string) => {
     Alert.alert(
-      "Confirmar remoção",
-      `Tem certeza que deseja remover o local "${localParaRemover}"?`,
+      "Remover local?",
+      `Tem certeza que deseja remover o local "${local}"?`,
       [
-        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
         {
           text: "Remover",
           style: "destructive",
           onPress: () => {
-            const atualizados = locais.filter(
-              (local) => local !== localParaRemover
-            );
-            setLocais(atualizados);
-            salvarLocais(atualizados);
+            setLocais((prev) => prev.filter((l) => l !== local));
+            if (localSelecionado === local) setLocalSelecionado("");
           },
         },
       ]
@@ -200,7 +157,7 @@ export default function GerenciadorEquipamentos() {
             setLocalSelecionado(itemValue);
           }
         }}
-        style={styles.picker}
+        style={styles.input}
       >
         <Picker.Item label="Selecione um local" value="" />
         {locais.map((local, index) => (
@@ -210,9 +167,7 @@ export default function GerenciadorEquipamentos() {
       </Picker>
 
       <View style={styles.button}>
-        <TouchableOpacity onPress={adicionarEquipamento}>
-          <Text style={styles.buttonText}>Adicionar Equipamento</Text>
-        </TouchableOpacity>
+        <Button title="Adicionar Equipamento" onPress={adicionarEquipamento} />
       </View>
 
       <FlatList
@@ -247,42 +202,38 @@ export default function GerenciadorEquipamentos() {
       />
 
       {/* Modal para novo local */}
-      <View>
-        <Modal visible={modalVisible} transparent animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.title}>Novo local</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite o novo local"
-                value={novoLocal}
-                onChangeText={setNovoLocal}
-              />
-              <View style={[styles.button, { marginBottom: 10 }]}>
-                <TouchableOpacity onPress={adicionarNovoLocal}>
-                  <Text style={{ color: "white" }}>Adicionar</Text>
-                </TouchableOpacity>
-              </View>
-              <Button title="Voltar" onPress={() => setModalVisible(false)} />
-              <Text style={[styles.title, { marginTop: 20 }]}>
-                Remover locais
-              </Text>
-              <FlatList
-                data={locais}
-                keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item }) => (
-                  <View style={styles.localItem}>
-                    <Text>{item}</Text>
-                    <TouchableOpacity onPress={() => removerLocal(item)}>
-                      <Text style={styles.remove}>🗑️</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Novo local</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o novo local"
+              value={novoLocal}
+              onChangeText={setNovoLocal}
+            />
+            <View style={[styles.button, { marginBottom: 10 }]}>
+              <Button title="Adicionar" onPress={adicionarNovoLocal} />
             </View>
+            <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+            <Text style={[styles.title, { marginTop: 20 }]}>
+              Remover locais
+            </Text>
+            <FlatList
+              data={locais}
+              keyExtractor={(item, index) => `${item}-${index}`}
+              renderItem={({ item }) => (
+                <View style={styles.localItem}>
+                  <Text style={{ flex: 1 }}>{item}</Text>
+                  <TouchableOpacity onPress={() => removerLocal(item)}>
+                    <Text style={styles.remove}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -291,70 +242,44 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingTop: 60,
-    backgroundColor: "#ececec",
+    backgroundColor: "#ffffff",
     flex: 1,
   },
   button: {
-    backgroundColor: "#003466",
-    padding: 14,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 30,
+    backgroundColor: "red",
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-
   title: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 25,
+    marginBottom: 20,
     color: "#003466",
     textAlign: "center",
   },
   input: {
     borderWidth: 1,
     borderColor: "#003466",
-    padding: 12,
+    padding: 10,
     marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: "#ffffff",
-  },
-  picker: {
-    marginBottom: 10,
-    borderRadius: 20,
-    backgroundColor: "#ffffff",
+    borderRadius: 6,
+    backgroundColor: "#f5f5f5",
   },
   list: {
     marginTop: 20,
   },
   item: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
     padding: 15,
-    marginBottom: 12,
-    borderRadius: 12,
+    marginBottom: 10,
+    borderRadius: 8,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     borderLeftWidth: 5,
     borderLeftColor: "#f39200",
   },
   text: {
     fontSize: 16,
     color: "#003466",
-    marginBottom: 4,
   },
   remove: {
     fontSize: 22,
@@ -368,7 +293,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    height: "auto",
     backgroundColor: "#000000aa",
     justifyContent: "center",
     alignItems: "center",
