@@ -7,7 +7,7 @@ import { Link } from 'expo-router';
 
 interface HeaderProps {
   texto?: string;  // Texto do título
-  local?: string;  // Rota para onde o botão vai
+  local?: "/" | `/${string}` | { pathname: string; params?: Record<string, any> };  // Rota para onde o botão vai
   icon?: React.ReactElement; // Cor opcional do ícone
 }
 export function Header({texto, local = "/", icon}: HeaderProps) {

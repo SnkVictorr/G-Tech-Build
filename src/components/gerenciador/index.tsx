@@ -150,7 +150,7 @@ export default function GerenciadorEquipamentos() {
     carregarLocais();
   }, []);
 
-  const salvarLocais = async (novosLocais) => {
+  const salvarLocais = async (novosLocais: string[]) => {
     try {
       await AsyncStorage.setItem("locaisSalvos", JSON.stringify(novosLocais));
     } catch (error) {
@@ -158,7 +158,7 @@ export default function GerenciadorEquipamentos() {
     }
   };
 
-  const removerLocal = (localParaRemover) => {
+  const removerLocal = (localParaRemover: string) => {
     Alert.alert(
       "Confirmar remoção",
       `Tem certeza que deseja remover o local "${localParaRemover}"?`,
@@ -206,7 +206,7 @@ export default function GerenciadorEquipamentos() {
         {locais.map((local, index) => (
           <Picker.Item key={`${local}-${index}`} label={local} value={local} />
         ))}
-        <Picker.Item label="+ Gerenciar Locais" value="adicionar" />
+        {/* <Picker.Item label="+ Gerenciar Locais" value="adicionar" /> */}
       </Picker>
 
       <View style={styles.button}>
